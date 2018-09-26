@@ -1,0 +1,782 @@
+#include "header.h"
+#include "lexer.h"
+#include "parser.h"
+#include "database.h"
+#include "relation.h"
+#include "tuple.h"
+#include "interpreter.h"
+#include "graph.h"
+#include "node.h"
+#include "predicate.h"
+#include <iostream>
+
+std::string typeToString(tokentype t){
+    std::map<tokentype,std::string> typekey;
+    typekey[COMMA]="COMMA";    typekey[PERIOD]="PERIOD"; typekey[Q_MARK]="Q_MARK";
+    typekey[LEFT_PAREN]="LEFT_PAREN"; typekey[RIGHT_PAREN]="RIGHT_PAREN"; 
+    typekey[COLON]="COLON";
+    typekey[COLON_DASH]="COLON_DASH"; typekey[MULTIPLY]="MULTIPLY"; typekey[ADD]="ADD";
+    typekey[SCHEMES]="SCHEMES"; typekey[FACTS]="FACTS"; typekey[RULES]="RULES";
+    typekey[QUERIES]="QUERIES"; typekey[ID]="ID"; typekey[STRING]="STRING";
+    typekey[COMMENT]="COMMENT"; typekey[WHITESPACE]="WHITESPACE";
+    typekey[UNDEFINED]="UNDEFINED";
+    typekey[ENDOFFILE]="EOF";
+    return typekey[t];
+}
+
+using namespace std;
+//int argc, char *argv[]
+int main(int argc, char *argv[]){
+//*projects 1,2
+    lexer lexerMain;
+    parser parserMain;
+    //project 1
+    std::list<token> tokenList = lexerMain.loadList(argv[1]);
+    //lexerMain.printTokens();
+    //project 2
+    parserMain.parse( tokenList );
+    //parserMain.print();
+//*/
+
+/*project 5 testing
+    //building a graph from a vector of rules
+    
+    std::cout << "RULES:\n";
+    //RULE 0
+    predicate r0h;
+    parameter r0hp0;
+    parameter r0hp1;
+    predicate r0b0;
+    parameter r0b0p0;
+    parameter r0b0p1;
+    predicate r0b1;
+    parameter r0b1p0;
+    parameter r0b1p1;
+    //NOTE HEAD PREDICATE
+    r0h.setName("A");
+    r0hp0.setValue("X");
+    r0hp1.setValue("Y");
+    r0h.addParameter(r0hp0);
+    r0h.addParameter(r0hp1);
+    rule r0(r0h);
+    //BODY PREDICATES
+    //0
+    r0b0.setName("B");
+    r0b0p0.setValue("X");
+    r0b0p1.setValue("Y");
+    r0b0.addParameter(r0b0p0);
+    r0b0.addParameter(r0b0p1);
+    r0.addPredicate(r0b0);
+    //1
+    r0b1.setName("E");
+    r0b1p0.setValue("X");
+    r0b1p1.setValue("Y");
+    r0b1.addParameter(r0b1p0);
+    r0b1.addParameter(r0b1p1);
+    r0.addPredicate(r0b1);
+    std::cout << r0.toString() << std::endl;
+    
+    
+    //RULE 1
+    predicate r1h;
+    parameter r1hp0;
+    parameter r1hp1;
+    predicate r1b0;
+    parameter r1b0p0;
+    parameter r1b0p1;
+    predicate r1b1;
+    parameter r1b1p0;
+    parameter r1b1p1;
+    //NOTE head predicate
+    r1h.setName("B");
+    r1hp0.setValue("X");
+    r1hp1.setValue("Y");
+    r1h.addParameter(r1hp0);
+    r1h.addParameter(r1hp1);
+    rule r1(r1h);
+    //BODY PREDICATES
+    //0
+    r1b0.setName("C");
+    r1b0p0.setValue("X");
+    r1b0p1.setValue("Y");
+    r1b0.addParameter(r1b0p0);
+    r1b0.addParameter(r1b0p1);
+    r1.addPredicate(r1b0);
+    //
+    r1b1.setName("D");
+    r1b1p0.setValue("X");
+    r1b1p1.setValue("Y");
+    r1b1.addParameter(r1b1p0);
+    r1b1.addParameter(r1b1p1);
+    //r1.addPredicate(r1b1);
+    std::cout << r1.toString() << std::endl;
+    
+    //RULE 2
+    predicate r2h;
+    parameter r2hp0;
+    parameter r2hp1;
+    predicate r2b0;
+    parameter r2b0p0;
+    parameter r2b0p1;
+    //predicate r2b1;
+    //parameter r2b1p0;
+    //parameter r2b1p1;
+    //NOTE head predicate
+    r2h.setName("C");
+    r2hp0.setValue("X");
+    r2hp1.setValue("Y");
+    r2h.addParameter(r2hp0);
+    r2h.addParameter(r2hp1);
+    rule r2(r2h);
+    //BODY PREDICATES
+    //0
+    r2b0.setName("D");
+    r2b0p0.setValue("Y");
+    r2b0p1.setValue("X");
+    r2b0.addParameter(r2b0p0);
+    r2b0.addParameter(r2b0p1);
+    r2.addPredicate(r2b0);
+    //1
+    //r2b0.setName("D");
+    //r2b0p0.setValue("X");
+    //r2b0p1.setValue("Y");
+    //r2b0.addParameter(r2b1p0);
+    //r2b0.addParameter(r2b1p0);
+    //r2.addPredicate(r2b1);
+    std::cout << r2.toString() << std::endl;
+    
+    //RULE 3
+    predicate r3h;
+    parameter r3hp0;
+    parameter r3hp1;
+    predicate r3b0;
+    parameter r3b0p0;
+    parameter r3b0p1;
+    predicate r3b1;
+    parameter r3b1p0;
+    parameter r3b1p1;
+    //NOTE head predicate
+    r3h.setName("D");
+    r3hp0.setValue("X");
+    r3hp1.setValue("Y");
+    r3h.addParameter(r3hp0);
+    r3h.addParameter(r3hp1);
+    rule r3(r3h);
+    //BODY PREDICATES
+    //0
+    r3b0.setName("A");
+    r3b0p0.setValue("X");
+    r3b0p1.setValue("Y");
+    r3b0.addParameter(r3b0p0);
+    r3b0.addParameter(r3b0p1);
+    r3.addPredicate(r3b0);
+    //1
+    r3b1.setName("G");
+    r3b1p0.setValue("X");
+    r3b1p1.setValue("Y");
+    r3b1.addParameter(r3b1p0);
+    r3b1.addParameter(r3b1p1);
+    r3.addPredicate(r3b1);
+    std::cout << r3.toString() << std::endl;
+    
+    //RULE 4
+    predicate r4h;
+    parameter r4hp0;
+    parameter r4hp1;
+    predicate r4b0;
+    parameter r4b0p0;
+    parameter r4b0p1;
+    predicate r4b1;
+    parameter r4b1p0;
+    parameter r4b1p1;
+    //NOTE head predicate
+    r4h.setName("E");
+    r4hp0.setValue("X");
+    r4hp1.setValue("Y");
+    r4h.addParameter(r4hp0);
+    r4h.addParameter(r4hp1);
+    rule r4(r4h);
+    //BODY PREDICATES
+    //0
+    r4b0.setName("D");
+    r4b0p0.setValue("X");
+    r4b0p1.setValue("Y");
+    r4b0.addParameter(r4b0p0);
+    r4b0.addParameter(r4b0p1);
+    r4.addPredicate(r4b0);
+    //1
+    r4b1.setName("F");
+    r4b1p0.setValue("X");
+    r4b1p1.setValue("Y");
+    r4b1.addParameter(r4b1p0);
+    r4b1.addParameter(r4b1p1);
+    r4.addPredicate(r4b1);
+    std::cout << r4.toString() << std::endl;
+    
+    std::vector<rule> rules;
+    rules.push_back(r0);
+    rules.push_back(r1);
+    rules.push_back(r2);
+    rules.push_back(r3);
+    rules.push_back(r4);*/
+    
+    
+    
+//*project 4 testing
+    /*relation.combineSchemes
+        Relation r;
+        std::vector<std::string> scheme1;
+        scheme1.push_back("A");
+        scheme1.push_back("B");
+        scheme1.push_back("C");
+        scheme1.push_back("D");
+        std::vector<std::string> scheme2;
+        scheme2.push_back("D");
+        scheme2.push_back("E");
+        std::vector<std::string> cmb = r.combineSchemes(scheme1,scheme2);
+        std::cout << cmb[0];
+        for(unsigned int i=1; i<cmb.size(); i++){
+        std::cout << " " << cmb[i];
+        }
+        std::cout << std::endl;
+        //*/
+
+    /*bool Relation::isJoinable(std::vector<std::string> scheme1,Tuple t1,std::vector<std::string> scheme2,Tuple t2)
+        Relation r;
+        std::vector<std::string> scheme1;
+        scheme1.push_back("A");
+        scheme1.push_back("B");
+        scheme1.push_back("C");
+        scheme1.push_back("D");
+        Tuple t1;
+        t1.push_back("1");//A
+        t1.push_back("2");//B
+        t1.push_back("3");//C
+        t1.push_back("4");//D
+        std::vector<std::string> scheme2;
+        scheme2.push_back("D");
+        scheme2.push_back("A");
+        scheme2.push_back("O");
+        Tuple t2;
+        t2.push_back("4");//D
+        t2.push_back("1");//A
+        t2.push_back("5");//O
+        bool isJoinable = r.isJoinable(scheme1,t1,scheme2,t2);
+        if(isJoinable){
+            std::cout << "JOINABLE\n";
+        }else{
+            std::cout << "NOT JOINABLE\n";
+        }
+    //*/
+
+    //Relation Relation::join(Relation joinee)
+        /*TEST 1 - JOIN WITH ONE COMMON ATTRIBUTE
+        std::vector<std::string> s1;
+        s1.push_back("A");
+        s1.push_back("B");
+        Relation r1;
+        r1.setScheme(s1);
+        r1.setName("r1");
+        
+        Tuple r1t1;
+        r1t1.push_back("1");//A
+        r1t1.push_back("2");//B
+        
+        Tuple r1t2;
+        r1t2.push_back("2");//A
+        r1t2.push_back("1");//B
+        
+        Tuple r1t3;
+        r1t3.push_back("2");//A
+        r1t3.push_back("3");//B
+        
+        r1.addTuple(r1t1);
+        r1.addTuple(r1t2);
+        r1.addTuple(r1t3);
+        
+        std::vector<std::string> s2;
+        s2.push_back("B");
+        s2.push_back("C");
+        Relation r2;
+        r2.setScheme(s2);
+        r2.setName("r2");
+        
+        Tuple r2t1;
+        r2t1.push_back("1");//B
+        r2t1.push_back("1");//C
+        
+        Tuple r2t2;
+        r2t2.push_back("1");//B
+        r2t2.push_back("2");//C
+        
+        Tuple r2t3;
+        r2t3.push_back("2");//B
+        r2t3.push_back("2");//C
+        
+        r2.addTuple(r2t1);
+        r2.addTuple(r2t2);
+        r2.addTuple(r2t3);
+        
+        //r1
+        // A B
+        // 1 2
+        // 2 1
+        // 2 3
+        
+        //r2
+        //B C
+        //1 1
+        //1 2
+        //2 2
+        //
+        
+        //SHOULD GIVE
+        // ABC
+        // 122
+        // 211
+        // 212
+        //
+        std::cout << "r2\n" << r2.toString() << std::endl;
+        std::cout << "r1\n" << r1.toString() << std::endl;
+        
+        
+        Relation r3 = r1.join(r2);
+        std::cout << "r3\n" << r3.toString() << std::endl;
+        */
+        /*TEST 2 - JOIN WITH ONE COMMON ATTRIBUTE
+        std::vector<std::string> s1;
+        s1.push_back("B");
+        s1.push_back("C");
+        s1.push_back("D");
+        Relation r1;
+        r1.setScheme(s1);
+        r1.setName("r1");
+        
+        Tuple r1t1;
+        r1t1.push_back("1");//B
+        r1t1.push_back("2");//C
+        r1t1.push_back("1");//D
+        
+        Tuple r1t2;
+        r1t2.push_back("2");//B
+        r1t2.push_back("1");//C
+        r1t2.push_back("2");//D
+        
+        Tuple r1t3;
+        r1t3.push_back("2");//B
+        r1t3.push_back("2");//C
+        r1t3.push_back("3");//D
+        
+        r1.addTuple(r1t1);
+        r1.addTuple(r1t2);
+        r1.addTuple(r1t3);
+        
+        std::vector<std::string> s2;
+        s2.push_back("A");
+        s2.push_back("E");
+        s2.push_back("C");
+        Relation r2;
+        r2.setScheme(s2);
+        r2.setName("r2");
+        
+        Tuple r2t1;
+        r2t1.push_back("1");//A
+        r2t1.push_back("2");//E
+        r2t1.push_back("2");//C
+        
+        Tuple r2t2;
+        r2t2.push_back("2");//A
+        r2t2.push_back("1");//E
+        r2t2.push_back("1");//C
+        
+        Tuple r2t3;
+        r2t3.push_back("2");//A
+        r2t3.push_back("1");//E
+        r2t3.push_back("2");//C
+        
+        r2.addTuple(r2t1);
+        r2.addTuple(r2t2);
+        r2.addTuple(r2t3);
+        
+        //r1
+        //B C D
+        //1 2 1
+        //2 1 2
+        //2 2 3
+        
+        //r2
+        //A E C
+        //1 2 2
+        //2 1 1
+        // 2 1 2
+        
+        //SHOULD GIVE
+        //BCDAE
+        //12112
+        //12121
+        //21221
+        //22321
+        //22313
+        std::cout << "r2\n" << r2.toString() << std::endl;
+        std::cout << "r1\n" << r1.toString() << std::endl;
+        
+        
+        Relation r3 = r1.join(r2);
+        std::cout << "r3\n" << r3.toString() << std::endl;
+        //*/
+        /*TEST 3 - JOIN WITH TWO COMMON ATTRIBUTES
+        std::vector<std::string> s1;
+        s1.push_back("A");
+        s1.push_back("B");
+        s1.push_back("C");
+        Relation r1;
+        r1.setScheme(s1);
+        r1.setName("r1");
+        
+        Tuple r1t1;
+        r1t1.push_back("1");//A
+        r1t1.push_back("2");//B
+        r1t1.push_back("3");//C
+        
+        Tuple r1t2;
+        r1t2.push_back("2");//A
+        r1t2.push_back("2");//B
+        r1t2.push_back("4");//C
+        
+        Tuple r1t3;
+        r1t3.push_back("2");//A
+        r1t3.push_back("3");//B
+        r1t3.push_back("5");//C
+        
+        r1.addTuple(r1t1);
+        r1.addTuple(r1t2);
+        r1.addTuple(r1t3);
+        
+        std::vector<std::string> s2;
+        s2.push_back("A");
+        s2.push_back("B");
+        s2.push_back("D");
+        Relation r2;
+        r2.setScheme(s2);
+        r2.setName("r2");
+        
+        Tuple r2t1;
+        r2t1.push_back("1");//A
+        r2t1.push_back("1");//B
+        r2t1.push_back("1");//D
+        
+        Tuple r2t2;
+        r2t2.push_back("2");//A
+        r2t2.push_back("2");//B
+        r2t2.push_back("1");//D
+        
+        Tuple r2t3;
+        r2t3.push_back("2");//A
+        r2t3.push_back("2");//B
+        r2t3.push_back("2");//D
+        
+        r2.addTuple(r2t1);
+        r2.addTuple(r2t2);
+        r2.addTuple(r2t3);
+        
+        //r1
+        //ABC
+        //123
+        //224
+        //235
+        
+        //r2
+        //ABD
+        //111
+        //221
+        //222
+        
+        //SHOULD GIVE
+        //ABCD
+        //2241
+        //2242
+        std::cout << "r2\n" << r2.toString() << std::endl;
+        std::cout << "r1\n" << r1.toString() << std::endl;
+        
+        
+        Relation r3 = r1.join(r2);
+        std::cout << "r3\n" << r3.toString() << std::endl;
+    //*/
+        /*TEST 4 - JOIN WITH NO COMMON ATTRIBUTES
+        std::vector<std::string> s1;
+        s1.push_back("A");
+        s1.push_back("B");
+        Relation r1;
+        r1.setScheme(s1);
+        r1.setName("r1");
+        
+        Tuple r1t1;
+        r1t1.push_back("1");//A
+        r1t1.push_back("2");//B
+        
+        Tuple r1t2;
+        r1t2.push_back("2");//A
+        r1t2.push_back("1");//B
+        
+        r1.addTuple(r1t1);
+        r1.addTuple(r1t2);
+        
+        std::vector<std::string> s2;
+        s2.push_back("C");
+        s2.push_back("D");
+        Relation r2;
+        r2.setScheme(s2);
+        r2.setName("r2");
+        
+        Tuple r2t1;
+        r2t1.push_back("1");//C
+        r2t1.push_back("1");//D
+        
+        Tuple r2t2;
+        r2t2.push_back("1");//C
+        r2t2.push_back("2");//D
+        
+        Tuple r2t3;
+        r2t3.push_back("2");//C
+        r2t3.push_back("2");//D
+        
+        r2.addTuple(r2t1);
+        r2.addTuple(r2t2);
+        r2.addTuple(r2t3);
+        
+        //r1
+        //AB
+        //12
+        //21
+        
+        //r2
+        //CD
+        //11
+        //12
+        //22
+        
+        //SHOULD GIVE
+        //ABCD
+        //1211
+        //1212
+        //1222
+        //2111
+        //2112
+        //2122
+        std::cout << "r2\n" << r2.toString() << std::endl;
+        std::cout << "r1\n" << r1.toString() << std::endl;
+        
+        
+        Relation r3 = r1.join(r2);
+        std::cout << "r3\n" << r3.toString() << std::endl;
+        //*/
+        /*TEST 5 - JOIN WITH ONLY COMMON ATTRIBUTES
+        std::vector<std::string> s1;
+        s1.push_back("A");
+        s1.push_back("B");
+        Relation r1;
+        r1.setScheme(s1);
+        r1.setName("r1");
+        
+        Tuple r1t1;
+        r1t1.push_back("1");//A
+        r1t1.push_back("2");//B
+        
+        Tuple r1t2;
+        r1t2.push_back("2");//A
+        r1t2.push_back("1");//B
+        
+        r1.addTuple(r1t1);
+        r1.addTuple(r1t2);
+        
+        std::vector<std::string> s2;
+        s2.push_back("A");
+        s2.push_back("B");
+        Relation r2;
+        r2.setScheme(s2);
+        r2.setName("r2");
+        
+        Tuple r2t1;
+        r2t1.push_back("1");//C
+        r2t1.push_back("1");//D
+        
+        Tuple r2t2;
+        r2t2.push_back("1");//C
+        r2t2.push_back("2");//D
+        
+        Tuple r2t3;
+        r2t3.push_back("2");//C
+        r2t3.push_back("1");//D
+        
+        r2.addTuple(r2t1);
+        r2.addTuple(r2t2);
+        r2.addTuple(r2t3);
+        
+        //r1
+        //AB
+        //12
+        //21
+        
+        //r2
+        //CD
+        //11
+        //12
+        //21
+        
+        //SHOULD GIVE
+        //AB
+        //12
+        //21
+        std::cout << "r2\n" << r2.toString() << std::endl;
+        std::cout << "r1\n" << r1.toString() << std::endl;
+        
+        
+        Relation r3 = r1.join(r2);
+        std::cout << "r3\n" << r3.toString() << std::endl;
+        //*/
+        /*TEST 6 - JOIN WITH EMPTY RELATION
+        //*/
+    //question - What happens if I try to join two relations whose schemes only differ in ordering? - ANSWER: It does not union.
+    //Relation Relation::relUnion(Relation r2)
+        /*TEST 1 - UNION OF TWO COMPATIBLE RELATIONS
+        std::vector<std::string> s1;
+        s1.push_back("A");
+        s1.push_back("B");
+        Relation r1;
+        r1.setScheme(s1);
+        r1.setName("r1");
+        
+        Tuple r1t1;
+        r1t1.push_back("1");//A
+        r1t1.push_back("2");//B
+        
+        Tuple r1t2;
+        r1t2.push_back("2");//A
+        r1t2.push_back("1");//B
+        
+        Tuple r1t3;
+        r1t3.push_back("2");//A
+        r1t3.push_back("3");//B
+        
+        r1.addTuple(r1t1);
+        r1.addTuple(r1t2);
+        r1.addTuple(r1t3);
+        
+        std::vector<std::string> s2;
+        s2.push_back("A");
+        s2.push_back("B");
+        Relation r2;
+        r2.setScheme(s2);
+        r2.setName("r2");
+        
+        Tuple r2t1;
+        r2t1.push_back("1");//B
+        r2t1.push_back("1");//C
+        
+        Tuple r2t2;
+        r2t2.push_back("1");//B
+        r2t2.push_back("2");//C
+        
+        Tuple r2t3;
+        r2t3.push_back("2");//B
+        r2t3.push_back("2");//C
+        
+        r2.addTuple(r2t1);
+        r2.addTuple(r2t2);
+        r2.addTuple(r2t3);
+        
+        //r1
+        //A B
+        //1 2
+        //2 1
+        //2 3
+        
+        //r2
+        //A B
+        //1 1
+        //1 2
+        //2 2
+        //
+        
+        //SHOULD GIVE
+        //AB
+        //12
+        //21
+        //23
+        //11
+        //22
+    
+        std::cout << "r2\n" << r2.toString() << std::endl;
+        std::cout << "r1\n" << r1.toString() << std::endl;
+        
+        
+        Relation r3 = r1.relUnion(r2);
+        std::cout << "r3\n" << r3.toString() << std::endl;
+        //*/
+    
+//*project 4
+    Database db;
+    Interpreter interpret;
+    interpret.loadRelations(parserMain.getSchemes(),db);
+    interpret.loadTuples(parserMain.getFacts(),db);
+    interpret.interpretRules(parserMain.getRules(),db);
+    
+//*/
+/*project 3 testing
+    Relation testrel;
+    
+    std::vector<std::string> scheme;
+    scheme.push_back("A");
+    scheme.push_back("B");
+    testrel.setScheme(scheme);
+    
+    Tuple ta;
+    ta.push_back("a");
+    ta.push_back("b");
+    
+    Tuple tb;
+    tb.push_back("a");
+    tb.push_back("c");
+    
+    Tuple tc;
+    tc.push_back("d");
+    tc.push_back("d");
+    
+    
+    testrel.addTuple(ta);
+    testrel.addTuple(tb);
+    testrel.addTuple(tc);
+    
+    //SELECT TESTING
+    Relation testsel = testrel.valueSelect(0,"a");
+    //Relation testsel1 = testrel.valueSelect("a",0);
+    Relation testsel2 = testrel.idSelect(0,1);
+    
+    
+    //PROJECT TESTING
+    std::vector<int> attributes;
+    //attributes.push_back(1);
+    attributes.push_back(0);
+    attributes.push_back(0); //TODO Fix this so that it doesn't make double attributes!
+    Relation testproj = testrel.project(attributes);
+    
+    //RENAME TESTING
+    std::vector<std::string> testscheme;
+    testscheme.push_back("a");
+    testscheme.push_back("b");
+    Relation testren = testrel.rename(testscheme);
+    
+    std::cout << "\n\n\nRELATION\n" << testrel.toString() << std::endl;
+    std::cout << "SELECT\n" << testsel.toString() << '\n' << testsel2.toString() << std::endl;
+    std::cout << "PROJECT\n" << testproj.toString() << std::endl;
+    std::cout << "RENAME\n" << testren.toString() << std::endl;
+//*/
+//*project 3
+    std::cout << "Query Evaluation\n";
+    interpret.askQueries(parserMain.getQueries(),db);
+//*/
+    
+    
+    
+    return 0;
+}
